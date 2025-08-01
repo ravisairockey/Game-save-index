@@ -43,6 +43,4 @@ This project uses the GitHub API to fetch the contents of the `/saves` directory
 
 ---
 
-<p align="center">
-  This project was built with the assistance of an AI software engineer.
-</p>
+
