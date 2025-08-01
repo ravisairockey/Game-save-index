@@ -1297,30 +1297,7 @@
             composer.render();
         }
 
-        function init() {
-            createNetworkVisualization(config.currentFormation, config.densityFactor);
-             document.querySelectorAll('.theme-button').forEach(b => b.classList.remove('active'));
-             document.querySelector(`.theme-button[data-theme="${config.activePaletteIndex}"]`).classList.add('active');
-            updateTheme(config.activePaletteIndex);
-            animate();
-        }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            composer.setSize(window.innerWidth, window.innerHeight);
-
-             bloomPass.resolution.set(window.innerWidth, window.innerHeight);
-        }
-        window.addEventListener('resize', onWindowResize);
-
-        init();
-
-
-        // Game Save Fetching Logic
-        document.addEventListener('DOMContentLoaded', () => {
+        function fetchGameSaves() {
             const username = 'ravisairockey';
             const repo = 'Game-save-index';
             const savesPath = 'saves';
@@ -1368,7 +1345,38 @@
                     console.error('Error fetching save files:', error);
                     container.innerHTML = `<div class="error-message">Could not load save files. Check your internet connection or the browser console for details.</div>`;
                 });
-        });
+        }
+
+        function init() {
+            createNetworkVisualization(config.currentFormation, config.densityFactor);
+            const themeButtons = document.querySelectorAll('.theme-button');
+            if (themeButtons.length > 0) {
+                themeButtons.forEach(b => b.classList.remove('active'));
+                const activeButton = document.querySelector(`.theme-button[data-theme="${config.activePaletteIndex}"]`);
+                if (activeButton) activeButton.classList.add('active');
+            }
+            updateTheme(config.activePaletteIndex);
+            animate();
+            fetchGameSaves(); // Fetch saves after 3D scene is initialized
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+
+             if(bloomPass) bloomPass.resolution.set(window.innerWidth, window.innerHeight);
+        }
+        window.addEventListener('resize', onWindowResize);
+
+        // Check if the DOM is already loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
 </body>
 </html>
