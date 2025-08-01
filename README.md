@@ -1,9 +1,5 @@
 # 🎮 Game Save Index
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/ravisairockey/Game-save-index/main/game-save-index-banner.svg" alt="Game Save Index Banner">
-</p>
-
 A visually stunning, interactive showcase for your game save files, powered by a dynamic 3D background and automatic updates from your Git repository.
 
 ---
@@ -14,11 +10,11 @@ A visually stunning, interactive showcase for your game save files, powered by a
 
 ## 🚀 Features
 
-- **Dynamic Updates:** Automatically detects and displays `.zip` files from the `saves` directory in your GitHub repository.
-- **Interactive 3D Background:** A mesmerizing, animated neural network background built with Three.js.
-- **Glassmorphism UI:** A sleek, modern "frosted glass" interface for the save file cards.
-- **Responsive Design:** A fluid layout that works beautifully on all screen sizes, from mobile to desktop.
-- **Minimalist Interface:** A clean, unobtrusive UI that prioritizes the content and the visual experience.
+- **⚡ Dynamic Updates:** Automatically detects and displays `.zip` files from the `saves` directory.
+- **🌌 Interactive 3D Background:** A mesmerizing, animated background built with Three.js.
+- **💎 Glassmorphism UI:** A sleek, modern "frosted glass" interface for all UI elements.
+- **📱 Responsive Design:** A fluid layout that works beautifully on all screen sizes.
+- **✨ Minimalist Interface:** A clean, unobtrusive UI that prioritizes the content.
 
 ## ⚙️ How It Works
 
@@ -37,11 +33,13 @@ This project uses the GitHub API to fetch the contents of the `/saves` directory
 
 ## 🛠️ Technologies Used
 
-- **HTML5**
-- **CSS3** (with advanced features like CSS Grid and custom properties)
-- **JavaScript** (ES6 Modules)
-- **Three.js** for the interactive 3D background
-- **GSAP** for UI animations
+<p align="left">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5"/>
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3"/>
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript"/>
+  <img src="https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=three.js&logoColor=white" alt="Three.js"/>
+  <img src="https://img.shields.io/badge/GSAP-88CE02?style=for-the-badge&logo=gsap&logoColor=white" alt="GSAP"/>
+</p>
 
 ---
 
