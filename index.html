@@ -4,67 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Save Index</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0a0f1f;
-            --primary-glow: #00e5ff;
-            --secondary-glow: #ff00e5;
-            --text-color: #e0e0e0;
-            --card-bg: rgba(20, 25, 40, 0.6);
-            --card-border: rgba(0, 229, 255, 0.2);
-            --card-shadow: rgba(0, 229, 255, 0.1);
-            --loader-color: var(--primary-glow);
-        }
-
-        @keyframes background-pan {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes fade-in-up {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+            --bg-dark: #0a0e17;
+            --bg-secondary: #131a2a;
+            --accent-primary: #00f0ff;
+            --accent-secondary: #0077b6;
+            --text-primary: #f0f8ff;
+            --text-secondary: #b0c4de;
+            --glass-bg: rgba(25, 40, 65, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 1% 1%, var(--primary-glow), transparent 25%), radial-gradient(circle at 99% 99%, var(--secondary-glow), transparent 25%);
-            background-size: 200% 200%;
-            color: var(--text-color);
+            background: var(--bg-dark);
+            color: var(--text-primary);
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            animation: background-pan 20s ease infinite;
+            display: flex;
+            flex-direction: column;
             overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
         }
 
         header {
+            background: var(--bg-secondary);
+            padding: 1.5rem 2rem;
             text-align: center;
-            margin-bottom: 3rem;
-            animation: fade-in-up 0.8s ease-out;
+            border-bottom: 1px solid var(--accent-primary);
+            box-shadow: 0 4px 20px rgba(0, 240, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
         }
 
         header h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            color: #fff;
-            text-shadow: 0 0 10px var(--primary-glow), 0 0 20px var(--primary-glow);
             margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-primary);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 10;
         }
 
         #save-container {
@@ -74,24 +85,31 @@
         }
 
         .save-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
+            background: var(--glass-bg);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px 0 var(--card-shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
             opacity: 0;
-            animation: fade-in-up 0.5s ease-out forwards;
+            animation: cardAppear 0.5s ease-out forwards;
+            animation-delay: calc(var(--order) * 0.1s + 0.6s);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            position: relative;
         }
 
-        .save-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 12px 40px 0 var(--card-shadow);
-            border-color: var(--primary-glow);
+        .save-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
         }
 
         .card-content {
@@ -100,16 +118,29 @@
         }
 
         .card-content h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            color: var(--primary-glow);
             margin: 0 0 0.5rem 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            color: var(--accent-primary);
+            letter-spacing: 1px;
         }
 
         .card-content p {
+            margin: 0.3rem 0;
             font-size: 0.9rem;
-            color: #ccc;
-            margin: 0.25rem 0;
+            color: var(--text-secondary);
+        }
+
+        .file-size {
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .file-size::before {
+            content: '📦';
         }
 
         .download-button {
@@ -117,157 +148,297 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
-            color: #fff;
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--accent-primary);
             text-align: center;
             padding: 1rem;
             text-decoration: none;
-            font-weight: 700;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-top: 1px solid var(--glass-border);
             position: relative;
             overflow: hidden;
         }
-        
+
+        .download-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.2), transparent);
+            transition: all 0.6s ease;
+        }
+
         .download-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px var(--primary-glow);
+            background: rgba(0, 240, 255, 0.2);
         }
 
-        .download-button svg {
-            width: 20px;
-            height: 20px;
+        .download-button:hover::before {
+            left: 100%;
         }
 
-        .loader-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 4rem;
+        .download-button:active {
+            transform: scale(0.98);
         }
 
-        .loader {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255, 255, 255, 0.2);
-            border-top-color: var(--loader-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        .info-message {
-            text-align: center;
-            padding: 2rem;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
+        .download-icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
         }
 
         footer {
+            background: var(--bg-secondary);
             text-align: center;
-            padding: 2rem;
-            margin-top: 2rem;
+            padding: 1.5rem;
             font-size: 0.9rem;
-            color: #aaa;
+            margin-top: 2rem;
+            z-index: 10;
         }
 
         footer a {
-            color: var(--primary-glow);
+            color: var(--accent-primary);
             text-decoration: none;
-            transition: text-shadow 0.3s ease;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        footer a:hover {
-            text-shadow: 0 0 5px var(--primary-glow);
+        footer a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent-primary);
+            transition: width 0.3s ease;
+        }
+
+        footer a:hover::after {
+            width: 100%;
+        }
+
+        .loader {
+            display: none;
+            width: 48px;
+            height: 48px;
+            margin: 2rem auto;
+            border: 3px solid rgba(0, 240, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--accent-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .error-message h2 {
+            color: var(--accent-primary);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 1.5rem;
+            }
+            
+            #save-container {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main {
+                padding: 1rem;
+            }
+            
+            .card-content {
+                padding: 1rem;
+            }
+            
+            .download-button {
+                padding: 0.8rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Game Save Index</h1>
-        </header>
-        <main id="save-container">
-            <div class="loader-container">
-                <div class="loader"></div>
-            </div>
-        </main>
-        <footer>
-            <p>Powered by <a href="https://github.com/ravisairockey/Game-save-index" target="_blank">Game-save-index</a></p>
-        </footer>
-    </div>
+    <div id="particles-js"></div>
+    <header>
+        <h1 data-value="GAME SAVE INDEX">GAME SAVE INDEX</h1>
+    </header>
+    <main>
+        <div class="loader" id="loader"></div>
+        <div id="save-container"></div>
+    </main>
+    <footer>
+        <p>Powered by <a href="https://github.com/ravisairockey/Game-save-index" target="_blank">Game-save-index</a></p>
+    </footer>
 
+    <svg style="display: none;" xmlns="http://www.w3.org/2000/svg">
+        <symbol id="download-icon" viewBox="0 0 24 24">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+        </symbol>
+    </svg>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Particle.js config
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                    "color": { "value": "#00f0ff" },
+                    "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" } },
+                    "opacity": { "value": 0.5, "random": false, "anim": { "enable": false } },
+                    "size": { "value": 3, "random": true, "anim": { "enable": false } },
+                    "line_linked": { "enable": true, "distance": 150, "color": "#00f0ff", "opacity": 0.4, "width": 1 },
+                    "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                    "modes": { "repulse": { "distance": 100, "duration": 0.4 }, "push": { "particles_nb": 4 } }
+                },
+                "retina_detect": true
+            });
+
+            // Title scramble effect
+            const title = document.querySelector('header h1');
+            const originalText = title.dataset.value;
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            let interval = null;
+            let iteration = 0;
+
+            interval = setInterval(() => {
+                title.innerText = originalText.split("")
+                    .map((letter, index) => {
+                        if(index < iteration) {
+                            return originalText[index];
+                        }
+                        return letters[Math.floor(Math.random() * 26)];
+                    })
+                    .join("");
+
+                if(iteration >= originalText.length){
+                    clearInterval(interval);
+                }
+                iteration += 1 / 3;
+            }, 30);
+
+            // Core functionality
             const username = 'ravisairockey';
             const repo = 'Game-save-index';
             const savesPath = 'saves';
             const container = document.getElementById('save-container');
-
+            const loader = document.getElementById('loader');
+            
+            loader.style.display = 'block';
+            
             const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${savesPath}`;
-
-            const formatBytes = (bytes, decimals = 2) => {
-                if (bytes === 0) return '0 Bytes';
-                const k = 1024;
-                const dm = decimals < 0 ? 0 : decimals;
-                const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-            };
-
-            const displayMessage = (message) => {
-                container.innerHTML = `<div class="info-message"><p>${message}</p></div>`;
-            };
 
             fetch(apiUrl)
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Network response was not ok: ${response.statusText}`);
-                    }
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     return response.json();
                 })
                 .then(files => {
-                    container.innerHTML = ''; // Clear loader
-
-                    if (files.message && files.message.includes("Not Found")) {
-                        displayMessage("Could not find the 'saves' directory. Make sure it exists in your repository and contains your save files.");
-                        return;
-                    }
-
+                    loader.style.display = 'none';
+                    
                     const saveFiles = files.filter(file => file.type === 'file' && file.name.endsWith('.zip'));
-
+                    
                     if (saveFiles.length === 0) {
-                        displayMessage("No .zip save files found in the 'saves' directory. Add some and they'll appear here!");
+                        let message = "No .zip save files found. Upload your game saves in ZIP format.";
+                        if (files.message && files.message.includes("Not Found")) {
+                            message = "Could not find the 'saves' directory. Please create it and add your save files.";
+                        }
+                        container.innerHTML = `<div class="error-message"><h2>No Save Files</h2><p>${message}</p></div>`;
                         return;
                     }
 
                     saveFiles.forEach((file, index) => {
-                        const saveName = file.name.replace('.zip', '').replace(/[-_]/g, ' ');
+                        const saveName = file.name.replace('.zip', '').replace(/_/g, ' ');
                         const downloadUrl = file.download_url;
-                        const fileSize = formatBytes(file.size);
+                        const fileSize = file.size ? formatFileSize(file.size) : 'Size unknown';
 
                         const card = document.createElement('div');
                         card.className = 'save-card';
-                        card.style.animationDelay = `${index * 100}ms`;
-
+                        card.style.setProperty('--order', index);
+                        
                         card.innerHTML = `
                             <div class="card-content">
                                 <h2>${saveName}</h2>
                                 <p>File: ${file.name}</p>
-                                <p>Size: ${fileSize}</p>
+                                <p class="file-size">${fileSize}</p>
                             </div>
                             <a href="${downloadUrl}" class="download-button" download>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 15.586l-4.293-4.293a1 1 0 011.414-1.414L11 12.172V4a1 1 0 112 0v8.172l1.879-1.879a1 1 0 111.414 1.414L12 15.586zM2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12zm18 0a8 8 0 10-16 0 8 8 0 0016 0z"></path></svg>
-                                <span>Download Save</span>
+                                <svg class="download-icon"><use xlink:href="#download-icon"></use></svg>
+                                Download Save
                             </a>
                         `;
                         container.appendChild(card);
                     });
+
+                    // Add 3D tilt effect to cards
+                    const cards = document.querySelectorAll('.save-card');
+                    cards.forEach(card => {
+                        card.addEventListener('mousemove', (e) => {
+                            const rect = card.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            const { width, height } = rect;
+                            const rotateX = (y / height - 0.5) * -20; // -10 to 10
+                            const rotateY = (x / width - 0.5) * 20; // -10 to 10
+                            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                        });
+                        card.addEventListener('mouseleave', () => {
+                            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+                        });
+                    });
                 })
                 .catch(error => {
                     console.error('Error fetching save files:', error);
-                    displayMessage('Failed to load save files. Check the browser console for more details.');
+                    loader.style.display = 'none';
+                    container.innerHTML = `<div class="error-message"><h2>Connection Error</h2><p>Could not load save files. Please check your internet connection.</p><p><small>${error.message}</small></p></div>`;
                 });
+                
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+            }
         });
     </script>
 </body>
