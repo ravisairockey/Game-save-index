@@ -157,6 +157,9 @@
                     settingsToggle.classList.remove('open');
                 }
             });
+            
+            // Stop propagation on the panel itself to prevent it from closing when clicked inside
+            settingsPanel.addEventListener('click', (e) => e.stopPropagation());
 
             createNetworkVisualization(config.currentFormation, config.densityFactor);
             updateTheme(config.activePaletteIndex);
