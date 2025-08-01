@@ -10,8 +10,8 @@
 
     <style>
         :root {
-            --hue1: 210; /* Blue */
-            --hue2: 280; /* Purple */
+            --hue1: 210;
+            --hue2: 280;
             --bg-dark: #0a0e17;
             --text-primary: #f0f8ff;
         }
@@ -19,26 +19,51 @@
         body { font-family: 'Roboto', sans-serif; background: var(--bg-dark); color: var(--text-primary); overflow: hidden; }
         canvas { display: block; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: -1; }
         .main-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; z-index: 10; }
-        .top-bar { position: fixed; top: 0; left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: rgba(10, 14, 23, 0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid hsl(var(--hue1) 80% 50% / 0.3); z-index: 20; }
-        .top-bar h1 { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: #fff; text-shadow: 0 0 10px hsl(var(--hue1) 80% 50%); }
-        .controls-group { display: flex; align-items: center; gap: 1rem; }
-        .control-button, #settings-toggle { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s ease; }
-        .control-button:hover, #settings-toggle:hover { background: rgba(255, 255, 255, 0.2); }
-        #settings-toggle { transition: transform 0.3s ease; }
-        #settings-toggle.open { transform: rotate(90deg); }
-        #settings-panel { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: linear-gradient(235deg, hsl(var(--hue1) 50% 10% / 0.8), hsl(var(--hue1) 50% 10% / 0) 50%), linear-gradient(hsl(220deg 25% 4.8% / 0.7)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-left: 1px solid hsl(var(--hue2), 12%, 30%); z-index: 30; padding: 2rem; transition: right 0.4s ease-in-out; }
-        #settings-panel.open { right: 0; }
-        #settings-panel h2 { margin-bottom: 1.5rem; font-family: 'Orbitron', sans-serif; }
-        .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
-        .theme-button { width: 40px; height: 40px; border-radius: 8px; border: 2px solid rgba(255, 255, 255, .3); cursor: pointer; transition: all .2s; }
-        .theme-button.active { border-color: #fff; box-shadow: 0 0 10px #fff; }
-        #theme-1 { background: linear-gradient(45deg, #4F46E5, #C026D3); }
-        #theme-2 { background: linear-gradient(45deg, #F59E0B, #DC2626); }
-        #theme-3 { background: linear-gradient(45deg, #EC4899, #3B82F6); }
-        #theme-4 { background: linear-gradient(45deg, #10B981, #FACC15); }
-        .density-label { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
-        .density-slider { width: 100%; }
-        #save-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; max-width: 1600px; margin: 0 auto; padding: 100px 2rem 2rem 2rem; }
+        
+        .top-nav {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+        }
+
+        nav {
+            height: 50px;
+            padding: 0 1rem;
+            border-radius: 100px;
+            border: 1px solid hsl(var(--hue1) 50% 30% / 0.5);
+            position: relative;
+            background: linear-gradient(hsl(220deg 25% 8% / 0.7), hsl(220deg 25% 4.8% / 0.7));
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        nav::before, nav::after, nav ul.lit {
+            filter: url('#spotlight');
+        }
+        nav::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 100px;
+            pointer-events: none;
+            border: 1px solid white;
+            filter: url('#ambience') brightness(2);
+        }
+
+        nav ul { display: flex; align-items: center; padding: 0; margin: 0; list-style-type: none; height: 100%; }
+        nav ul.lit { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+        nav ul.lit li { padding: 0 1.25rem; }
+        nav ul.content li a { display: grid; place-items: center; height: 100%; padding: 0 1.25rem; text-decoration: none; color: inherit; opacity: 0.6; transition: opacity 0.25s ease-out; }
+        nav ul.content li a:hover, nav ul.content li a[data-active='true'] { opacity: 1; }
+        
+        .title-logo { color: #fff; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; text-shadow: 0 0 8px hsl(var(--hue1) 80% 50%); }
+
+        #save-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; max-width: 1600px; margin: 0 auto; padding: 80px 2rem 2rem 2rem; }
         .save-card { background: linear-gradient(hsl(220deg 25% 4.8% / 0.5), hsl(220deg 25% 4.8% / 0.8)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid hsl(var(--hue2), 12%, 30%); border-radius: 22px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; transition: transform 0.3s ease, box-shadow 0.3s ease; color: #f0f8ff; }
         .save-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
         .save-card h2 { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.4rem; }
@@ -46,35 +71,33 @@
         .download-button { margin-top: auto; padding: 0.8rem 1.2rem; background: hsl(var(--hue1) 30% 15% / 0.5); border: 1px solid hsl(var(--hue1) 15% 16% / 0.5); color: #fff; text-decoration: none; text-align: center; border-radius: 8px; font-weight: 600; transition: all 0.2s ease; }
         .download-button:hover { background: hsl(var(--hue1) 40% 24% / 0.8); box-shadow: 0 0 15px hsl(var(--hue1) 80% 50% / 0.5); }
         .loader, .error-message { grid-column: 1 / -1; text-align: center; padding: 3rem; font-size: 1.2rem; color: #b0c4de; background: rgba(10, 14, 23, 0.5); backdrop-filter: blur(5px); border-radius: 22px; }
-        @media (max-width: 768px) { .top-bar { padding: 1rem; } .top-bar h1 { font-size: 1.2rem; } .control-button span { display: none; } .control-button, #settings-toggle { padding: 0.5rem; } #save-container { padding-top: 80px; } }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
     </style>
 </head>
 <body>
     <canvas id="neural-network-canvas"></canvas>
-    <header class="top-bar">
-        <h1>Game Save Index</h1>
-        <div class="controls-group">
-            <button id="change-formation-btn" class="control-button"><span>Formation</span></button>
-            <button id="pause-play-btn" class="control-button"><span>Pause</span></button>
-            <button id="reset-camera-btn" class="control-button"><span>Reset Cam</span></button>
-            <button id="settings-toggle">⚙️</button>
-        </div>
+    
+    <header class="top-nav">
+        <nav>
+            <a class="title-logo" href="#">Game Save Index</a>
+            <ul aria-hidden="true" class="lit">
+                <li>Formation</li>
+                <li>Pause</li>
+                <li>Reset Cam</li>
+                <li>Settings</li>
+            </ul>
+            <ul class="content">
+                <li><a data-active="true" href="#" id="change-formation-btn"><span>Formation</span></a></li>
+                <li><a href="#" id="pause-play-btn"><span>Pause</span></a></li>
+                <li><a href="#" id="reset-camera-btn"><span>Reset Cam</span></a></li>
+                <li><a href="#" id="settings-toggle"><span>Settings</span></a></li>
+            </ul>
+        </nav>
     </header>
-    <aside id="settings-panel">
-        <h2>Settings</h2>
-        <div id="theme-selector">
-            <div class="theme-grid">
-                <button class="theme-button" id="theme-1" data-theme="0"></button>
-                <button class="theme-button" id="theme-2" data-theme="1"></button>
-                <button class="theme-button" id="theme-3" data-theme="2"></button>
-                <button class="theme-button" id="theme-4" data-theme="3"></button>
-            </div>
-        </div>
-        <div id="density-controls">
-            <div class="density-label"><span>Density</span><span id="density-value">100%</span></div>
-            <input type="range" min="20" max="100" value="100" class="density-slider" id="density-slider">
-        </div>
-    </aside>
+
+    <!-- This would be the settings modal, initially hidden -->
+    <!-- <aside id="settings-panel"> ... </aside> -->
+
     <div class="main-content">
         <main>
             <div id="save-container">
@@ -82,9 +105,30 @@
             </div>
         </main>
     </div>
+
+    <svg class="sr-only">
+      <filter id="spotlight">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"></feGaussianBlur>
+        <feSpecularLighting result="lighting" in="blur" surfaceScale="5" specularConstant="0.75" specularExponent="80" lighting-color="#ffffff">
+          <fePointLight x="50" y="50" z="220"></fePointLight>
+        </feSpecularLighting>
+        <feComposite in="lighting" in2="SourceAlpha" operator="in" result="composite"></feComposite>
+        <feComposite in="SourceGraphic" in2="composite" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litPaint"></feComposite>
+      </filter>
+      <filter id="ambience">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"></feGaussianBlur>
+        <feSpecularLighting result="lighting" in="blur" surfaceScale="5" specularConstant="0.5" specularExponent="120" lighting-color="#ffffff">
+          <fePointLight x="50" y="50" z="300"></fePointLight>
+        </feSpecularLighting>
+        <feComposite in="lighting" in2="SourceAlpha" operator="in" result="composite"></feComposite>
+        <feComposite in="SourceGraphic" in2="composite" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litPaint"></feComposite>
+      </filter>
+    </svg>
+
     <script type="importmap">
-    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/" } }
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/", "gsap": "https://cdn.skypack.dev/gsap@3.12.0" } }
     </script>
+
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -93,8 +137,9 @@
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
         import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-        
-        // --- Start of full Three.js logic ---
+        import gsap from 'gsap';
+
+        // --- Start of full Three.js logic (same as before) ---
         const config = { paused: false, activePaletteIndex: 2, currentFormation: 0, numFormations: 4, densityFactor: 1 };
         const colorPalettes = [ [new THREE.Color(0x4F46E5), new THREE.Color(0x7C3AED), new THREE.Color(0xC026D3), new THREE.Color(0xDB2777), new THREE.Color(0x8B5CF6)], [new THREE.Color(0xF59E0B), new THREE.Color(0xF97316), new THREE.Color(0xDC2626), new THREE.Color(0x7F1D1D), new THREE.Color(0xFBBF24)], [new THREE.Color(0xEC4899), new THREE.Color(0x8B5CF6), new THREE.Color(0x6366F1), new THREE.Color(0x3B82F6), new THREE.Color(0xA855F7)], [new THREE.Color(0x10B981), new THREE.Color(0xA3E635), new THREE.Color(0xFACC15), new THREE.Color(0xFB923C), new THREE.Color(0x4ADE80)] ];
         const scene = new THREE.Scene();
@@ -127,7 +172,6 @@
         const connectionShader = { vertexShader: `${noiseFunctions}\nattribute vec3 startPoint;attribute vec3 endPoint;attribute float connectionStrength;attribute float pathIndex;attribute vec3 connectionColor;uniform float uTime;uniform vec3 uPulsePositions[3];uniform float uPulseTimes[3];uniform float uPulseSpeed;varying vec3 vColor;varying float vConnectionStrength;varying float vPulseIntensity;varying float vPathPosition;float getPulseIntensity(vec3 worldPos, vec3 pulsePos, float pulseTime) {if (pulseTime < 0.0) return 0.0;float timeSinceClick = uTime - pulseTime;if (timeSinceClick < 0.0 || timeSinceClick > 3.0) return 0.0;float pulseRadius = timeSinceClick * uPulseSpeed;float distToClick = distance(worldPos, pulsePos);float pulseThickness = 2.0;float waveProximity = abs(distToClick - pulseRadius);return smoothstep(pulseThickness, 0.0, waveProximity) * smoothstep(3.0, 0.0, timeSinceClick);}void main() {float t = position.x;vPathPosition = t;vec3 midPoint = mix(startPoint, endPoint, 0.5);float pathOffset = sin(t * 3.14159) * 0.1;vec3 perpendicular = normalize(cross(normalize(endPoint - startPoint), vec3(0.0, 1.0, 0.0)));if (length(perpendicular) < 0.1) perpendicular = vec3(1.0, 0.0, 0.0);midPoint += perpendicular * pathOffset;vec3 p0 = mix(startPoint, midPoint, t);vec3 p1 = mix(midPoint, endPoint, t);vec3 finalPos = mix(p0, p1, t);float noiseTime = uTime * 0.2;float noise = fbm(vec3(pathIndex * 0.1, t * 0.5, noiseTime), noiseTime);finalPos += perpendicular * noise * 0.1;vec3 worldPos = (modelMatrix * vec4(finalPos, 1.0)).xyz;float totalPulseIntensity = 0.0;for (int i = 0; i < 3; i++) {totalPulseIntensity += getPulseIntensity(worldPos, uPulsePositions[i], uPulseTimes[i]);}vPulseIntensity = min(totalPulseIntensity, 1.0);vColor = connectionColor;vConnectionStrength = connectionStrength;gl_Position = projectionMatrix * modelViewMatrix * vec4(finalPos, 1.0);}`, fragmentShader: `uniform float uTime;uniform vec3 uPulseColors[3];varying vec3 vColor;varying float vConnectionStrength;varying float vPulseIntensity;varying float vPathPosition;void main() {vec3 baseColor = vColor * (0.7 + 0.3 * sin(uTime * 0.5 + vPathPosition * 10.0));float flowPattern = sin(vPathPosition * 20.0 - uTime * 3.0) * 0.5 + 0.5;float flowIntensity = 0.3 * flowPattern * vConnectionStrength;vec3 finalColor = baseColor;if (vPulseIntensity > 0.0) {vec3 pulseColor = mix(vec3(1.0), uPulseColors[0], 0.3);finalColor = mix(baseColor, pulseColor, vPulseIntensity);flowIntensity += vPulseIntensity * 0.5;}finalColor *= (0.6 + flowIntensity + vConnectionStrength * 0.4);float alpha = 0.8 * vConnectionStrength + 0.2 * flowPattern;alpha = mix(alpha, min(1.0, alpha * 2.0), vPulseIntensity);gl_FragColor = vec4(finalColor, alpha);}` };
         let neuralNetwork = null, nodesMesh = null, connectionsMesh = null;
         const clock = new THREE.Clock();
-        function createStarfield() { const count = 5000, pos = []; for (let i = 0; i < count; i++) { const r = THREE.MathUtils.randFloat(40, 120); const phi = Math.acos(THREE.MathUtils.randFloatSpread(2)); const theta = THREE.MathUtils.randFloat(0, Math.PI * 2); pos.push(r * Math.sin(phi) * Math.cos(theta), r * Math.sin(phi) * Math.sin(theta), r * Math.cos(phi)); } const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15, sizeAttenuation: true, depthWrite: false, opacity: 0.8, transparent: true }); return new THREE.Points(geo, mat); }
         class Node { constructor(position, level = 0, type = 0) { this.position = position; this.connections = []; this.level = level; this.type = type; this.size = type === 0 ? THREE.MathUtils.randFloat(0.7, 1.2) : THREE.MathUtils.randFloat(0.4, 0.9); this.distanceFromRoot = 0; } addConnection(node, strength = 1.0) { if (!this.isConnectedTo(node)) { this.connections.push({ node, strength }); node.connections.push({ node: this, strength }); } } isConnectedTo(node) { return this.connections.some(conn => conn.node === node); } }
         function generateNeuralNetwork(formationIndex, densityFactor = 1.0) { let nodes = []; let rootNode; function generateQuantumCortex() { rootNode = new Node(new THREE.Vector3(0, 0, 0), 0, 0); rootNode.size = 1.5; nodes.push(rootNode); const layers = 5, primaryAxes = 6, nodesPerAxis = 8, axisLength = 20; const axisEndpoints = []; for (let a = 0; a < primaryAxes; a++) { const phi = Math.acos(-1 + (2 * a) / primaryAxes); const theta = Math.PI * (1 + Math.sqrt(5)) * a; const dirVec = new THREE.Vector3(Math.sin(phi) * Math.cos(theta), Math.sin(phi) * Math.sin(theta), Math.cos(phi)); let prevNode = rootNode; for (let i = 1; i <= nodesPerAxis; i++) { const t = i / nodesPerAxis; const distance = axisLength * Math.pow(t, 0.8); const pos = new THREE.Vector3().copy(dirVec).multiplyScalar(distance); const nodeType = (i === nodesPerAxis) ? 1 : 0; const newNode = new Node(pos, i, nodeType); newNode.distanceFromRoot = distance; nodes.push(newNode); prevNode.addConnection(newNode, 1.0 - (t * 0.3)); prevNode = newNode; if (i === nodesPerAxis) axisEndpoints.push(newNode); } } const ringDistances = [5, 10, 15]; const ringNodes = []; for (const ringDist of ringDistances) { const nodesInRing = Math.floor(ringDist * 3 * densityFactor); const ringLayer = []; for (let i = 0; i < nodesInRing; i++) { const t = i / nodesInRing; const ringPhi = Math.acos(2 * Math.random() - 1); const ringTheta = 2 * Math.PI * t; const pos = new THREE.Vector3(ringDist * Math.sin(ringPhi) * Math.cos(ringTheta), ringDist * Math.sin(ringPhi) * Math.sin(ringTheta), ringDist * Math.cos(ringPhi)); const level = Math.ceil(ringDist / 5); const nodeType = Math.random() < 0.4 ? 1 : 0; const newNode = new Node(pos, level, nodeType); newNode.distanceFromRoot = ringDist; nodes.push(newNode); ringLayer.push(newNode); } ringNodes.push(ringLayer); for (let i = 0; i < ringLayer.length; i++) { const node = ringLayer[i]; const nextNode = ringLayer[(i + 1) % ringLayer.length]; node.addConnection(nextNode, 0.7); if (i % 4 === 0 && ringLayer.length > 5) { const jumpIdx = (i + Math.floor(ringLayer.length / 2)) % ringLayer.length; node.addConnection(ringLayer[jumpIdx], 0.4); } } } for (const ring of ringNodes) { for (const node of ring) { let closestAxisNode = null; let minDist = Infinity; for (const n of nodes) { if (n === rootNode || n === node) continue; if (n.level === 0 || n.type !== 0) continue; const dist = node.position.distanceTo(n.position); if (dist < minDist) { minDist = dist; closestAxisNode = n; } } if (closestAxisNode && minDist < 8) { const strength = 0.5 + (1 - minDist / 8) * 0.5; node.addConnection(closestAxisNode, strength); } } } for (let r = 0; r < ringNodes.length - 1; r++) { const innerRing = ringNodes[r]; const outerRing = ringNodes[r + 1]; const connectionsCount = Math.floor(innerRing.length * 0.5); for (let i = 0; i < connectionsCount; i++) { const innerNode = innerRing[Math.floor(Math.random() * innerRing.length)]; const outerNode = outerRing[Math.floor(Math.random() * outerRing.length)]; if (!innerNode.isConnectedTo(outerNode)) { innerNode.addConnection(outerNode, 0.6); } } } for (let i = 0; i < axisEndpoints.length; i++) { const startNode = axisEndpoints[i]; const endNode = axisEndpoints[(i + 2) % axisEndpoints.length]; const numIntermediates = 3; let prevNode = startNode; for (let j = 1; j <= numIntermediates; j++) { const t = j / (numIntermediates + 1); const pos = new THREE.Vector3().lerpVectors(startNode.position, endNode.position, t); pos.add(new THREE.Vector3(THREE.MathUtils.randFloatSpread(3), THREE.MathUtils.randFloatSpread(3), THREE.MathUtils.randFloatSpread(3))); const newNode = new Node(pos, startNode.level, 0); newNode.distanceFromRoot = rootNode.position.distanceTo(pos); nodes.push(newNode); prevNode.addConnection(newNode, 0.5); prevNode = newNode; } prevNode.addConnection(endNode, 0.5); } } function generateHyperdimensionalMesh() { rootNode = new Node(new THREE.Vector3(0, 0, 0), 0, 0); rootNode.size = 1.5; nodes.push(rootNode); const dimensions = 4; const nodesPerDimension = Math.floor(40 * densityFactor); const maxRadius = 20; const dimensionVectors = [ new THREE.Vector3(1, 1, 1).normalize(), new THREE.Vector3(-1, 1, -1).normalize(), new THREE.Vector3(1, -1, -1).normalize(), new THREE.Vector3(-1, -1, 1).normalize() ]; const dimensionNodes = []; for (let d = 0; d < dimensions; d++) { const dimNodes = []; const dimVec = dimensionVectors[d]; for (let i = 0; i < nodesPerDimension; i++) { const distance = maxRadius * Math.pow(Math.random(), 0.7); const randomVec = new THREE.Vector3(THREE.MathUtils.randFloatSpread(1), THREE.MathUtils.randFloatSpread(1), THREE.MathUtils.randFloatSpread(1)).normalize(); const biasedVec = new THREE.Vector3().addVectors(dimVec.clone().multiplyScalar(0.6 + Math.random() * 0.4), randomVec.clone().multiplyScalar(0.3)).normalize(); const pos = biasedVec.clone().multiplyScalar(distance); const isLeaf = Math.random() < 0.4 || distance > maxRadius * 0.8; const level = Math.floor(distance / (maxRadius / 4)) + 1; const newNode = new Node(pos, level, isLeaf ? 1 : 0); newNode.distanceFromRoot = distance; newNode.dimension = d; nodes.push(newNode); dimNodes.push(newNode); if (distance < maxRadius * 0.3) rootNode.addConnection(newNode, 0.7); } dimensionNodes.push(dimNodes); } for (let d = 0; d < dimensions; d++) { const dimNodes = dimensionNodes[d]; dimNodes.sort((a, b) => a.distanceFromRoot - b.distanceFromRoot); const layers = 4; const nodesPerLayer = Math.ceil(dimNodes.length / layers); for (let layer = 0; layer < layers; layer++) { const startIdx = layer * nodesPerLayer; const endIdx = Math.min(startIdx + nodesPerLayer, dimNodes.length); for (let i = startIdx; i < endIdx; i++) { const node = dimNodes[i]; const connectionsCount = 1 + Math.floor(Math.random() * 3); const nearbyNodes = dimNodes.slice(startIdx, endIdx).filter(n => n !== node).sort((a, b) => node.position.distanceTo(a.position) - node.position.distanceTo(b.position)); for (let j = 0; j < Math.min(connectionsCount, nearbyNodes.length); j++) { if (!node.isConnectedTo(nearbyNodes[j])) { node.addConnection(nearbyNodes[j], 0.4 + Math.random() * 0.4); } } if (layer > 0) { const prevLayer = dimNodes.slice((layer - 1) * nodesPerLayer, layer * nodesPerLayer).sort((a, b) => node.position.distanceTo(a.position) - node.position.distanceTo(b.position)); if (prevLayer.length > 0 && !node.isConnectedTo(prevLayer[0])) { node.addConnection(prevLayer[0], 0.8); } } } } } for (let d1 = 0; d1 < dimensions; d1++) { for (let d2 = d1 + 1; d2 < dimensions; d2++) { const connectionsCount = Math.floor(5 * densityFactor); for (let i = 0; i < connectionsCount; i++) { const n1 = dimensionNodes[d1][Math.floor(Math.random() * dimensionNodes[d1].length)]; const n2 = dimensionNodes[d2][Math.floor(Math.random() * dimensionNodes[d2].length)]; if (!n1.isConnectedTo(n2)) { const midPos = new THREE.Vector3().lerpVectors(n1.position, n2.position, 0.5); midPos.add(new THREE.Vector3(THREE.MathUtils.randFloatSpread(2), THREE.MathUtils.randFloatSpread(2), THREE.MathUtils.randFloatSpread(2))); const interNode = new Node(midPos, Math.max(n1.level, n2.level), 0); interNode.distanceFromRoot = rootNode.position.distanceTo(midPos); nodes.push(interNode); n1.addConnection(interNode, 0.5); interNode.addConnection(n2, 0.5); } } } } const jumpConnections = Math.floor(10 * densityFactor); for (let i = 0; i < jumpConnections; i++) { const startDim = Math.floor(Math.random() * dimensions); const endDim = (startDim + 2) % dimensions; const startNode = dimensionNodes[startDim][Math.floor(Math.random() * dimensionNodes[startDim].length)]; const endNode = dimensionNodes[endDim][Math.floor(Math.random() * dimensionNodes[endDim].length)]; if (!startNode.isConnectedTo(endNode)) { const numPoints = 3 + Math.floor(Math.random() * 3); let prevNode = startNode; for (let j = 1; j < numPoints; j++) { const t = j / numPoints; const pos = new THREE.Vector3().lerpVectors(startNode.position, endNode.position, t); pos.add(new THREE.Vector3(THREE.MathUtils.randFloatSpread(8) * Math.sin(t * Math.PI), THREE.MathUtils.randFloatSpread(8) * Math.sin(t * Math.PI), THREE.MathUtils.randFloatSpread(8) * Math.sin(t * Math.PI))); const jumpNode = new Node(pos, Math.max(startNode.level, endNode.level), 0); jumpNode.distanceFromRoot = rootNode.position.distanceTo(pos); nodes.push(jumpNode); prevNode.addConnection(jumpNode, 0.4); prevNode = jumpNode; } prevNode.addConnection(endNode, 0.4); } } } function generateNeuralVortex() { rootNode = new Node(new THREE.Vector3(0, 0, 0), 0, 0); rootNode.size = 1.8; nodes.push(rootNode); const numSpirals = 6; const totalHeight = 30; const maxRadius = 16; const nodesPerSpiral = Math.floor(30 * densityFactor); const spiralNodes = []; for (let s = 0; s < numSpirals; s++) { const spiralPhase = (s / numSpirals) * Math.PI * 2; const spiralArray = []; for (let i = 0; i < nodesPerSpiral; i++) { const t = i / (nodesPerSpiral - 1); const heightCurve = 1 - Math.pow(2 * t - 1, 2); const height = (t - 0.5) * totalHeight; const radiusCurve = Math.sin(t * Math.PI); const radius = maxRadius * radiusCurve; const revolutions = 2.5; const angle = spiralPhase + t * Math.PI * 2 * revolutions; const pos = new THREE.Vector3(radius * Math.cos(angle), height, radius * Math.sin(angle)); pos.add(new THREE.Vector3(THREE.MathUtils.randFloatSpread(1.5), THREE.MathUtils.randFloatSpread(1.5), THREE.MathUtils.randFloatSpread(1.5))); const level = Math.floor(t * 5) + 1; const isLeaf = Math.random() < 0.3 || i > nodesPerSpiral - 3; const newNode = new Node(pos, level, isLeaf ? 1 : 0); newNode.distanceFromRoot = Math.sqrt(radius * radius + height * height); newNode.spiralIndex = s; newNode.spiralPosition = t; nodes.push(newNode); spiralArray.push(newNode); } spiralNodes.push(spiralArray); } for (const spiral of spiralNodes) { rootNode.addConnection(spiral[0], 1.0); for (let i = 0; i < spiral.length - 1; i++) { spiral[i].addConnection(spiral[i + 1], 0.9); } } for (let s = 0; s < numSpirals; s++) { const currentSpiral = spiralNodes[s]; const nextSpiral = spiralNodes[(s + 1) % numSpirals]; const connectionPoints = 5; for (let c = 0; c < connectionPoints; c++) { const t = c / (connectionPoints - 1); const idx1 = Math.floor(t * (currentSpiral.length - 1)); const idx2 = Math.floor(t * (nextSpiral.length - 1)); currentSpiral[idx1].addConnection(nextSpiral[idx2], 0.7); } } for (let s = 0; s < numSpirals; s++) { const currentSpiral = spiralNodes[s]; const jumpSpiral = spiralNodes[(s + 2) % numSpirals]; const connections = 3; for (let c = 0; c < connections; c++) { const t1 = (c + 0.5) / connections; const t2 = (c + 1.0) / connections; const idx1 = Math.floor(t1 * (currentSpiral.length - 1)); const idx2 = Math.floor(t2 * (jumpSpiral.length - 1)); const start = currentSpiral[idx1]; const end = jumpSpiral[idx2]; const midPoint = new THREE.Vector3().lerpVectors(start.position, end.position, 0.5).multiplyScalar(0.7); const bridgeNode = new Node(midPoint, Math.max(start.level, end.level), 0); bridgeNode.distanceFromRoot = rootNode.position.distanceTo(midPoint); nodes.push(bridgeNode); start.addConnection(bridgeNode, 0.6); bridgeNode.addConnection(end, 0.6); } } const ringLevels = 5; for (let r = 0; r < ringLevels; r++) { const height = (r / (ringLevels - 1) - 0.5) * totalHeight * 0.7; const ringNodes = nodes.filter(n => n !== rootNode && Math.abs(n.position.y - height) < 2); ringNodes.sort((a, b) => Math.atan2(a.position.z, a.position.x) - Math.atan2(b.position.z, b.position.x)); if (ringNodes.length > 3) { for (let i = 0; i < ringNodes.length; i++) { ringNodes[i].addConnection(ringNodes[(i + 1) % ringNodes.length], 0.5); } } } const radialConnections = Math.floor(10 * densityFactor); const candidates = nodes.filter(n => n !== rootNode && n.position.length() > 5).sort(() => Math.random() - 0.5).slice(0, radialConnections); for (const node of candidates) { const numSegments = 1 + Math.floor(Math.random() * 2); let prevNode = node; for (let i = 1; i <= numSegments; i++) { const t = i / (numSegments + 1); const segPos = node.position.clone().multiplyScalar(1 - t); segPos.add(new THREE.Vector3(THREE.MathUtils.randFloatSpread(2), THREE.MathUtils.randFloatSpread(2), THREE.MathUtils.randFloatSpread(2))); const newNode = new Node(segPos, Math.floor(node.level * (1 - t)), 0); newNode.distanceFromRoot = rootNode.position.distanceTo(segPos); nodes.push(newNode); prevNode.addConnection(newNode, 0.7); prevNode = newNode; } prevNode.addConnection(rootNode, 0.8); } } function generateSynapticCloud() { rootNode = new Node(new THREE.Vector3(0, 0, 0), 0, 0); rootNode.size = 1.5; nodes.push(rootNode); const numClusters = 6; const maxDist = 18; const clusterNodes = []; for (let c = 0; c < numClusters; c++) { const phi = Math.acos(2 * Math.random() - 1); const theta = 2 * Math.PI * Math.random(); const distance = maxDist * (0.3 + 0.7 * Math.random()); const pos = new THREE.Vector3(distance * Math.sin(phi) * Math.cos(theta), distance * Math.sin(phi) * Math.sin(theta), distance * Math.cos(phi)); const clusterNode = new Node(pos, 1, 0); clusterNode.size = 1.2; clusterNode.distanceFromRoot = distance; nodes.push(clusterNode); clusterNodes.push(clusterNode); rootNode.addConnection(clusterNode, 0.9); } for (let i = 0; i < clusterNodes.length; i++) { for (let j = i + 1; j < clusterNodes.length; j++) { const dist = clusterNodes[i].position.distanceTo(clusterNodes[j].position); const probability = 1.0 - (dist / (maxDist * 2)); if (Math.random() < probability) { const strength = 0.5 + 0.5 * (1 - dist / (maxDist * 2)); clusterNodes[i].addConnection(clusterNodes[j], strength); } } } for (const cluster of clusterNodes) { const clusterSize = Math.floor(20 * densityFactor); const cloudRadius = 7 + Math.random() * 3; for (let i = 0; i < clusterSize; i++) { const radius = cloudRadius * Math.pow(Math.random(), 0.5); const dir = new THREE.Vector3(THREE.MathUtils.randFloatSpread(2), THREE.MathUtils.randFloatSpread(2), THREE.MathUtils.randFloatSpread(2)).normalize(); const pos = new THREE.Vector3().copy(cluster.position).add(dir.multiplyScalar(radius)); const distanceFromCluster = radius; const distanceFromRoot = rootNode.position.distanceTo(pos); const level = 2 + Math.floor(distanceFromCluster / 3); const isLeaf = Math.random() < 0.5; const newNode = new Node(pos, level, isLeaf ? 1 : 0); newNode.distanceFromRoot = distanceFromRoot; newNode.clusterRef = cluster; nodes.push(newNode); const strength = 0.7 * (1 - distanceFromCluster / cloudRadius); cluster.addConnection(newNode, strength); const nearbyNodes = nodes.filter(n => n !== newNode && n !== cluster && n.clusterRef === cluster && n.position.distanceTo(pos) < cloudRadius * 0.4); const connectionsCount = Math.floor(Math.random() * 3); nearbyNodes.sort((a, b) => pos.distanceTo(a.position) - pos.distanceTo(b.position)); for (let j = 0; j < Math.min(connectionsCount, nearbyNodes.length); j++) { const dist = pos.distanceTo(nearbyNodes[j].position); const connStrength = 0.4 * (1 - dist / (cloudRadius * 0.4)); newNode.addConnection(nearbyNodes[j], connStrength); } } } const interClusterCount = Math.floor(15 * densityFactor); for (let i = 0; i < interClusterCount; i++) { const cluster1 = clusterNodes[Math.floor(Math.random() * clusterNodes.length)]; let cluster2; do { cluster2 = clusterNodes[Math.floor(Math.random() * clusterNodes.length)]; } while (cluster2 === cluster1); const bridgePos = new THREE.Vector3().lerpVectors(cluster1.position, cluster2.position, 0.3 + Math.random() * 0.4); bridgePos.add(new THREE.Vector3(THREE.MathUtils.randFloatSpread(5), THREE.MathUtils.randFloatSpread(5), THREE.MathUtils.randFloatSpread(5))); const bridgeNode = new Node(bridgePos, 2, 0); bridgeNode.distanceFromRoot = rootNode.position.distanceTo(bridgePos); nodes.push(bridgeNode); cluster1.addConnection(bridgeNode, 0.5); cluster2.addConnection(bridgeNode, 0.5); const nearbyNodes = nodes.filter(n => n !== bridgeNode && n !== cluster1 && n !== cluster2 && n.position.distanceTo(bridgePos) < 8); if (nearbyNodes.length > 0) { const target = nearbyNodes[Math.floor(Math.random() * nearbyNodes.length)]; bridgeNode.addConnection(target, 0.4); } } const longRangeCount = Math.floor(10 * densityFactor); const outerNodes = nodes.filter(n => n.distanceFromRoot > maxDist * 0.6).sort(() => Math.random() - 0.5).slice(0, longRangeCount); for (const outerNode of outerNodes) { const numSegments = 2 + Math.floor(Math.random() * 2); let prevNode = outerNode; for (let i = 1; i <= numSegments; i++) { const t = i / (numSegments + 1); const segPos = outerNode.position.clone().multiplyScalar(1 - t * 0.8); segPos.add(new THREE.Vector3(THREE.MathUtils.randFloatSpread(4), THREE.MathUtils.randFloatSpread(4), THREE.MathUtils.randFloatSpread(4))); const newNode = new Node(segPos, outerNode.level, 0); newNode.distanceFromRoot = rootNode.position.distanceTo(segPos); nodes.push(newNode); prevNode.addConnection(newNode, 0.6); prevNode = newNode; } const innerNodes = nodes.filter(n => n.distanceFromRoot < maxDist * 0.4 && n !== rootNode); if (innerNodes.length > 0) { const targetNode = innerNodes[Math.floor(Math.random() * innerNodes.length)]; prevNode.addConnection(targetNode, 0.5); } } }
         switch (formationIndex % 4) { case 0: generateQuantumCortex(); break; case 1: generateHyperdimensionalMesh(); break; case 2: generateNeuralVortex(); break; case 3: generateSynapticCloud(); break; }
@@ -143,22 +187,18 @@
         function initApp() {
             const settingsPanel = document.getElementById('settings-panel');
             const settingsToggle = document.getElementById('settings-toggle');
-            const mainContent = document.querySelector('.main-content');
-
-            settingsToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
+            settingsToggle.addEventListener('click', () => {
                 settingsPanel.classList.toggle('open');
                 settingsToggle.classList.toggle('open');
             });
 
+            const mainContent = document.querySelector('.main-content');
             mainContent.addEventListener('click', () => {
                 if (settingsPanel.classList.contains('open')) {
                     settingsPanel.classList.remove('open');
                     settingsToggle.classList.remove('open');
                 }
             });
-            
-            // Stop propagation on the panel itself to prevent it from closing when clicked inside
             settingsPanel.addEventListener('click', (e) => e.stopPropagation());
 
             createNetworkVisualization(config.currentFormation, config.densityFactor);
@@ -192,7 +232,7 @@
                 controls.autoRotate = !config.paused;
             });
             document.getElementById('reset-camera-btn').addEventListener('click', () => controls.reset());
-            renderer.domElement.addEventListener('click', (e) => { if (!config.paused) triggerPulse(e.clientX, e.clientY); });
+            renderer.domElement.addEventListener('click', (e) => { if (e.target.tagName === 'CANVAS' && !config.paused) triggerPulse(e.clientX, e.clientY); });
             window.addEventListener('resize', onWindowResize);
             
             fetchGameSaves();
@@ -206,6 +246,48 @@
             
             const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${savesPath}`;
 
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(files => {
+                    container.innerHTML = '';
+                    const saveFiles = files.filter(file => file.name.endsWith('.zip'));
+                    if (saveFiles.length === 0) {
+                        container.innerHTML = `<div class="error-message">No .zip save files found.</div>`;
+                        return;
+                    }
+                    saveFiles.forEach(file => {
+                        const saveName = file.name.replace('.zip', '').replace(/_/g, ' ');
+                        const fileSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+                        const card = document.createElement('div');
+                        card.className = 'save-card';
+                        card.innerHTML = `
+                            <h2>${saveName}</h2>
+                            <p>File: ${file.name}</p>
+                            <p>Size: ${fileSize}</p>
+                            <a href="${file.download_url}" class="download-button" download>Download</a>
+                        `;
+                        container.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    container.innerHTML = `<div class="error-message">Failed to load save files.</div>`;
+                });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
+    </script>
+</body>
+</html>
+</content>
+
+        function fetchGameSaves() {
+            const container = document.getElementById('save-container');
+            const apiUrl = `https://api.github.com/repos/ravisairockey/Game-save-index/contents/saves`;
             fetch(apiUrl)
                 .then(response => response.json())
                 .then(files => {
