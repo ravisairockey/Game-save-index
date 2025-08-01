@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Save Index</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #2a2a2a;
+            --accent-color: #00aaff;
+            --text-color: #f0f0f0;
+            --card-bg-color: #333;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--secondary-color);
+            padding: 1rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        header h1 {
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 2rem;
+        }
+
+        #save-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .save-card {
+            background-color: var(--card-bg-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .save-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .card-content h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .card-content p {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .download-button {
+            display: block;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            text-align: center;
+            padding: 0.8rem;
+            text-decoration: none;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+        }
+
+        .download-button:hover {
+            background-color: #0088cc;
+        }
+
+        footer {
+            background-color: var(--secondary-color);
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+        }
+
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Game Save Index</h1>
+    </header>
+    <main id="save-container"></main>
+    <footer>
+        <p>Powered by <a href="https://github.com/ravisairockey/Game-save-index" target="_blank">Game-save-index</a></p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const username = 'ravisairockey';
+            const repo = 'Game-save-index';
+            const savesPath = 'saves';
+            const container = document.getElementById('save-container');
+
+            const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${savesPath}`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(files => {
+                    if (files.message && files.message.includes("Not Found")) {
+                        container.innerHTML = `<p>Could not find the 'saves' directory in the repository. Please make sure it exists and contains your save files.</p>`;
+                        return;
+                    }
+                    
+                    if (files.length === 0) {
+                        container.innerHTML = `<p>No save files found in the 'saves' directory.</p>`;
+                        return;
+                    }
+
+                    files.forEach(file => {
+                        if (file.type === 'file' && file.name.endsWith('.zip')) {
+                            const saveName = file.name.replace('.zip', '').replace(/_/g, ' ');
+                            const downloadUrl = file.download_url;
+
+                            const card = document.createElement('div');
+                            card.className = 'save-card';
+
+                            card.innerHTML = `
+                                <div class="card-content">
+                                    <h2>${saveName}</h2>
+                                    <p>File: ${file.name}</p>
+                                </div>
+                                <a href="${downloadUrl}" class="download-button" download>Download Save</a>
+                            `;
+
+                            container.appendChild(card);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching save files:', error);
+                    container.innerHTML = `<p>Error loading save files. Please check the console for details.</p>`;
+                });
+        });
+    </script>
+</body>
+</html>
