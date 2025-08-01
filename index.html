@@ -136,98 +136,10 @@
             color: #b0c4de;
         }
 
-        /* UI Panel Styles from 3D Demo */
-        .ui-panel {
-            position: fixed; /* Changed from absolute */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            background: rgba(0, 0, 0, .7);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 120, 50, .3);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, .5);
-            z-index: 20; /* Higher z-index */
-            padding: 15px;
-            color: #eee;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        #theme-selector {
-            top: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-width: 150px;
-        }
-
-        #theme-selector-title {
-            font-weight: 600;
-            font-size: 15px;
-            margin-bottom: 2px;
-        }
-
-        .theme-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .theme-button {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            border: 2px solid rgba(255, 255, 255, .3);
-            cursor: pointer;
-            transition: transform .2s, border-color .2s;
-            outline: none;
-            overflow: hidden;
-        }
-        .theme-button:hover, .theme-button:focus { transform: scale(1.05); border-color: rgba(255, 255, 255, .7); }
-        .theme-button.active { transform: scale(1.05); border-color: rgba(255, 255, 255, .9); box-shadow: 0 0 10px rgba(255, 200, 150, .6); }
-
-        #theme-1 { background: linear-gradient(45deg, #4F46E5, #7C3AED, #C026D3, #DB2777); }
-        #theme-2 { background: linear-gradient(45deg, #F59E0B, #F97316, #DC2626, #7F1D1D); }
-        #theme-3 { background: linear-gradient(45deg, #EC4899, #8B5CF6, #6366F1, #3B82F6); }
-        #theme-4 { background: linear-gradient(45deg, #10B981, #A3E635, #FACC15, #FB923C); }
-
-        #density-controls { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
-        .density-label { font-size: 13px; display: flex; justify-content: space-between; }
-        .density-slider { width: 100%; appearance: none; height: 4px; border-radius: 2px; background: rgba(255, 120, 50, .3); outline: none; cursor: pointer; }
-        .density-slider::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; border-radius: 50%; background: rgba(255, 120, 50, .8); cursor: pointer; transition: transform .1s, background .1s; }
-        .density-slider::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: rgba(255, 120, 50, .8); cursor: pointer; border: none; transition: transform .1s, background .1s; }
-        .density-slider::-webkit-slider-thumb:hover { transform: scale(1.1); background: rgba(255, 140, 50, 1); }
-        .density-slider::-moz-range-thumb:hover { transform: scale(1.1); background: rgba(255, 140, 50, 1); }
-
-        #control-buttons { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 20; background: rgba(0, 0, 0, .6); padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255, 120, 50, .2); }
-        .control-button { background: rgba(255, 120, 50, .2); color: #eee; border: 1px solid rgba(255, 150, 50, .3); padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: background-color 0.2s, transform 0.1s; white-space: nowrap; min-width: 80px; text-align: center; font-family: 'Roboto', sans-serif; }
-        .control-button:hover, .control-button:focus { background: rgba(255, 120, 50, .4); outline: none; }
-        .control-button:active { background: rgba(255, 120, 50, .6); transform: scale(0.95); }
-
     </style>
 </head>
 <body>
     <canvas id="neural-network-canvas"></canvas>
-
-    <!-- UI Panels for 3D Background -->
-    <div id="theme-selector" class="ui-panel">
-        <div id="theme-selector-title">Visual Theme</div>
-        <div class="theme-grid">
-            <button class="theme-button" id="theme-1" data-theme="0" aria-label="Theme 1"></button>
-            <button class="theme-button" id="theme-2" data-theme="1" aria-label="Theme 2"></button>
-            <button class="theme-button" id="theme-3" data-theme="2" aria-label="Theme 3"></button>
-            <button class="theme-button" id="theme-4" data-theme="3" aria-label="Theme 4"></button>
-        </div>
-        <div id="density-controls">
-            <div class="density-label"><span>Density</span><span id="density-value">100%</span></div>
-            <input type="range" min="20" max="100" value="100" class="density-slider" id="density-slider" aria-label="Network Density">
-        </div>
-    </div>
-
-    <div id="control-buttons">
-        <button id="change-formation-btn" class="control-button">Formation</button>
-        <button id="pause-play-btn" class="control-button">Pause</button>
-        <button id="reset-camera-btn" class="control-button">Reset Cam</button>
-    </div>
 
     <div class="content-wrapper">
         <header>
@@ -261,8 +173,8 @@
 
         const config = {
             paused: false,
-            activePaletteIndex: 1,
-            currentFormation: 0,
+            activePaletteIndex: 2, // Hard-coded to Theme #3 (index 2)
+            currentFormation: 0,   // Hard-coded to Quantum Cortex
             numFormations: 4,
             densityFactor: 1
         };
@@ -321,7 +233,7 @@
         controls.minDistance = 5;
         controls.maxDistance = 100;
         controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.15;
+        controls.autoRotateSpeed = 0.1; // Slowed down for ambient feel
         controls.enablePan = false;
 
         const composer = new EffectComposer(renderer);
@@ -1298,68 +1210,14 @@
         }
 
         renderer.domElement.addEventListener('click', (e) => {
-            if (e.target.closest('.ui-panel, #control-buttons')) return;
             if (!config.paused) triggerPulse(e.clientX, e.clientY);
         });
         renderer.domElement.addEventListener('touchstart', (e) => {
-            if (e.target.closest('.ui-panel, #control-buttons')) return;
             e.preventDefault();
             if (e.touches.length > 0 && !config.paused) {
                 triggerPulse(e.touches[0].clientX, e.touches[0].clientY);
             }
         }, { passive: false });
-
-        const themeButtons = document.querySelectorAll('.theme-button');
-        themeButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const idx = parseInt(btn.dataset.theme, 10);
-                updateTheme(idx);
-                themeButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
-        });
-
-        const densitySlider = document.getElementById('density-slider');
-        const densityValue = document.getElementById('density-value');
-        let densityTimeout;
-        densitySlider.addEventListener('input', (e) => {
-            e.stopPropagation();
-            const val = parseInt(densitySlider.value, 10);
-            config.densityFactor = val / 100;
-            densityValue.textContent = `${val}%`;
-
-            clearTimeout(densityTimeout);
-            densityTimeout = setTimeout(() => {
-                createNetworkVisualization(config.currentFormation, config.densityFactor);
-            }, 300);
-        });
-
-        const changeFormationBtn = document.getElementById('change-formation-btn');
-        const pausePlayBtn = document.getElementById('pause-play-btn');
-        const resetCameraBtn = document.getElementById('reset-camera-btn');
-
-        changeFormationBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            config.currentFormation = (config.currentFormation + 1) % config.numFormations;
-            createNetworkVisualization(config.currentFormation, config.densityFactor);
-             controls.autoRotate = false;
-             setTimeout(() => { controls.autoRotate = true; }, 2000);
-        });
-
-        pausePlayBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            config.paused = !config.paused;
-            pausePlayBtn.textContent = config.paused ? 'Play' : 'Pause';
-            controls.autoRotate = !config.paused;
-        });
-
-        resetCameraBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            controls.reset();
-             controls.autoRotate = false;
-             setTimeout(() => { controls.autoRotate = true; }, 1500);
-        });
 
         const clock = new THREE.Clock();
 
@@ -1437,12 +1295,6 @@
 
         function init() {
             createNetworkVisualization(config.currentFormation, config.densityFactor);
-            const themeButtons = document.querySelectorAll('.theme-button');
-            if (themeButtons.length > 0) {
-                themeButtons.forEach(b => b.classList.remove('active'));
-                const activeButton = document.querySelector(`.theme-button[data-theme="${config.activePaletteIndex}"]`);
-                if (activeButton) activeButton.classList.add('active');
-            }
             updateTheme(config.activePaletteIndex);
             animate();
             fetchGameSaves(); // Fetch saves after 3D scene is initialized
