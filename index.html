@@ -6,36 +6,36 @@
     <title>Game Save Index</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --bg-dark: #1a1d21;
-            --glass-bg: rgba(30, 35, 42, 0.5);
+            --glass-bg: rgba(30, 35, 42, 0.6);
             --border-color: rgba(255, 255, 255, 0.1);
             --text-primary: #e0e1e2;
             --text-secondary: #8a9199;
             --accent: #3b82f6;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg-dark); color: var(--text-primary); overflow: hidden; }
-        canvas { display: block; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: 1; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-primary); overflow: hidden; }
+        canvas { display: block; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: -1; }
+        
         .main-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; z-index: 10; }
         
         .floating-title {
             position: fixed;
             top: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 1rem;
             z-index: 20;
-            padding: 0.8rem 2rem;
+            padding: 0.8rem 1.5rem;
             background: var(--glass-bg);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(10px);
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            font-family: 'Inter', sans-serif;
-            font-size: 1.5rem;
-            color: var(--text-primary);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: #fff;
         }
 
         .floating-footer {
@@ -45,39 +45,39 @@
             transform: translateX(-50%);
             z-index: 20;
             font-size: 0.8rem;
-            color: #aaa;
+            color: var(--text-secondary);
         }
-        .floating-footer a { color: hsl(var(--hue1) 80% 70%); text-decoration: none; }
+        .floating-footer a { color: var(--accent); text-decoration: none; }
 
         #side-menu {
             position: fixed;
             top: 50%;
-            left: -220px;
+            right: -220px;
             transform: translateY(-50%);
             width: 200px;
             background: var(--glass-bg);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--border-color);
-            border-top-right-radius: 12px;
-            border-bottom-right-radius: 12px;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
             z-index: 30;
-            transition: left 0.4s ease-in-out;
+            transition: right 0.4s ease-in-out;
             padding: 1rem;
         }
-        #side-menu.open { left: 0; }
+        #side-menu.open { right: 0; }
 
         #menu-toggle {
             position: absolute;
             top: 50%;
-            left: 100%;
+            right: 100%;
             transform: translateY(-50%);
             width: 40px;
             height: 60px;
-            background: rgba(10, 14, 23, 0.8);
-            border: 1px solid hsl(var(--hue1) 80% 50% / 0.3);
-            border-left: none;
-            border-top-right-radius: 8px;
-            border-bottom-right-radius: 8px;
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-right: none;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
             cursor: pointer;
             display: grid;
             place-items: center;
@@ -97,26 +97,31 @@
             cursor: pointer;
             font-size: 14px;
             text-align: left;
+            transition: background-color 0.2s;
         }
+        .menu-content button:hover { background-color: rgba(255, 255, 255, 0.2); }
 
-        #save-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; max-width: 1600px; margin: 0 auto; padding: 80px 2rem 2rem 2rem; }
-        .save-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s ease, box-shadow 0.3s ease; color: var(--text-primary); }
-        .save-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
-        .save-card h2 { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.4rem; }
-        .save-card p { color: #b0c4de; font-size: 0.9rem; }
-        .download-button { margin-top: auto; padding: 0.8rem 1.2rem; background: hsl(var(--hue1) 30% 15% / 0.5); border: 1px solid hsl(var(--hue1) 15% 16% / 0.5); color: #fff; text-decoration: none; text-align: center; border-radius: 8px; font-weight: 600; transition: all 0.2s ease; }
-        .download-button:hover { background: hsl(var(--hue1) 40% 24% / 0.8); box-shadow: 0 0 15px hsl(var(--hue1) 80% 50% / 0.5); }
-        .loader, .error-message { grid-column: 1 / -1; text-align: center; padding: 3rem; font-size: 1.2rem; color: #b0c4de; background: rgba(10, 14, 23, 0.5); backdrop-filter: blur(5px); border-radius: 22px; }
+        #save-list { display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; max-width: 900px; margin: 0; padding: 80px 2rem 2rem 2rem; }
+        .save-item { width: 100%; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s; }
+        .save-item:hover { background-color: rgba(255,255,255,0.05); }
+        .save-info h2 { font-size: 1.2rem; font-weight: 600; }
+        .save-info p { font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.25rem; }
+        .download-button { padding: 0.6rem 1.2rem; background: var(--accent); color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; transition: background-color 0.2s; }
+        .download-button:hover { background-color: #2563eb; }
+        .loader, .error-message { width: 100%; text-align: center; padding: 3rem; font-size: 1.2rem; color: var(--text-secondary); background: var(--glass-bg); border-radius: 12px; }
     </style>
 </head>
 <body>
-    <canvas id="neural-network-canvas"></canvas>
+    <canvas id="background-canvas"></canvas>
     
     <header class="floating-title">Game Save Index</header>
 
     <aside id="side-menu">
         <div id="menu-toggle">☰</div>
         <div class="menu-content">
+            <button id="sort-name-btn">Sort by Name</button>
+            <button id="sort-date-btn">Sort by Date</button>
+            <hr style="border-color: rgba(255,255,255,0.2); margin: 1rem 0;">
             <button id="change-formation-btn">Formation</button>
             <button id="pause-play-btn">Pause</button>
             <button id="reset-camera-btn">Reset Cam</button>
@@ -124,10 +129,8 @@
     </aside>
 
     <div class="main-content">
-        <main>
-            <div id="save-container">
-                <div class="loader">Loading Save Files...</div>
-            </div>
+        <main id="save-list">
+            <div class="loader">Loading...</div>
         </main>
     </div>
 
@@ -146,35 +149,36 @@
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-        const config = { paused: false, currentFormation: 0, numFormations: 1 };
+        const config = { paused: false };
+        let saveFilesCache = [];
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a0e17);
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 5;
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('neural-network-canvas'), antialias: true });
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('background-canvas'), antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        const composer = new EffectComposer(renderer);
-        composer.addPass(new RenderPass(scene, camera));
-        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.7, 0.4, 0.5);
-        composer.addPass(bloomPass);
+        camera.position.z = 5;
         
-        const path = new THREE.CatmullRomCurve3(Array.from({ length: 10 }, () => new THREE.Vector3(Math.random() * 40 - 20, Math.random() * 20 - 10, Math.random() * 40 - 20)));
-        path.closed = true;
-        path.tension = 0.5;
-        const geometry = new THREE.TubeGeometry(path, 200, 0.5, 8, true);
-        const material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
-        const tube = new THREE.Mesh(geometry, material);
-        scene.add(tube);
+        let points;
+        function createPoints() {
+            if (points) scene.remove(points);
+            const positions = [];
+            for (let i = 0; i < 15000; i++) {
+                positions.push((Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15);
+            }
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            const material = new THREE.PointsMaterial({ color: 0x444444, size: 0.015 });
+            points = new THREE.Points(geometry, material);
+            scene.add(points);
+        }
 
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
-            const t = (clock.getElapsedTime() * 0.05) % 1;
-            const pos = path.getPointAt(t);
-            const lookAtPos = path.getPointAt((t + 0.01) % 1);
-            camera.position.lerp(pos, 0.1);
-            camera.lookAt(lookAtPos);
-            composer.render();
+            if (!config.paused) {
+                const elapsedTime = clock.getElapsedTime();
+                points.rotation.y = elapsedTime * 0.1;
+            }
+            renderer.render(scene, camera);
         }
 
         function initApp() {
@@ -182,46 +186,70 @@
             const toggle = document.getElementById('menu-toggle');
             toggle.addEventListener('click', () => menu.classList.toggle('open'));
 
-            document.getElementById('change-formation-btn').addEventListener('click', () => console.log("Change Formation"));
-            document.getElementById('pause-play-btn').addEventListener('click', () => console.log("Pause/Play"));
-            document.getElementById('reset-camera-btn').addEventListener('click', () => console.log("Reset Cam"));
+            document.getElementById('change-formation-btn').addEventListener('click', createPoints);
+            document.getElementById('pause-play-btn').addEventListener('click', () => { config.paused = !config.paused; });
+            document.getElementById('reset-camera-btn').addEventListener('click', () => { camera.position.set(0,0,5); camera.lookAt(0,0,0); });
+            document.getElementById('sort-name-btn').addEventListener('click', () => renderSaves('name'));
+            document.getElementById('sort-date-btn').addEventListener('click', () => renderSaves('date'));
 
+            createPoints();
             animate();
             fetchGameSaves();
         }
 
+        function formatTitle(filename) {
+            let name = filename.replace('.zip', '').replace(/_/g, ' ').replace(/-/g, ' ');
+            name = name.replace(/save|files|file/gi, '').trim();
+            const acronyms = { 'ac': "Assassin's Creed", 'rdr2': 'Red Dead Redemption 2', 'gta v': 'Grand Theft Auto V' };
+            for (const key in acronyms) {
+                if (name.toLowerCase().startsWith(key)) {
+                    name = name.replace(new RegExp(key, 'i'), acronyms[key]);
+                }
+            }
+            name = name.replace(/\d{1,2}\s?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s?\d{2,4}/i, '').trim();
+            return name.replace(/\s+/g, ' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
+        }
+
+        function renderSaves(sortBy = 'name') {
+            const container = document.getElementById('save-list');
+            container.innerHTML = '';
+            const sortedFiles = [...saveFilesCache].sort((a, b) => {
+                if (sortBy === 'date') {
+                    const dateA = new Date(a.name.split('_').pop().split('.').shift().replace(/-/g, ' '));
+                    const dateB = new Date(b.name.split('_').pop().split('.').shift().replace(/-/g, ' '));
+                    return dateB - dateA;
+                }
+                return a.name.localeCompare(b.name);
+            });
+
+            sortedFiles.forEach(file => {
+                const card = document.createElement('div');
+                card.className = 'save-item';
+                card.innerHTML = `
+                    <div class="save-info">
+                        <h2>${formatTitle(file.name)}</h2>
+                        <p>File: ${file.name} | Size: ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                    </div>
+                    <a href="${file.download_url}" class="download-button" download>Download</a>
+                `;
+                container.appendChild(card);
+            });
+        }
+
         function fetchGameSaves() {
-            const container = document.getElementById('save-container');
             const apiUrl = `https://api.github.com/repos/ravisairockey/Game-save-index/contents/saves`;
             fetch(apiUrl)
                 .then(response => response.json())
                 .then(files => {
-                    container.innerHTML = '';
-                    const saveFiles = files.filter(file => file.name.endsWith('.zip'));
-                    if (saveFiles.length === 0) {
-                        container.innerHTML = `<div class="error-message">No .zip save files found.</div>`;
-                        return;
-                    }
-                    saveFiles.forEach(file => {
-                        const saveName = file.name.replace('.zip', '').replace(/_/g, ' ');
-                        const fileSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
-                        const card = document.createElement('div');
-                        card.className = 'save-card';
-                        card.innerHTML = `
-                            <h2>${saveName}</h2>
-                            <p>File: ${file.name}</p>
-                            <p>Size: ${fileSize}</p>
-                            <a href="${file.download_url}" class="download-button" download>Download</a>
-                        `;
-                        container.appendChild(card);
-                    });
+                    saveFilesCache = files.filter(file => file.name.endsWith('.zip'));
+                    renderSaves();
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    container.innerHTML = `<div class="error-message">Failed to load save files.</div>`;
+                    document.getElementById('save-list').innerHTML = `<div class="error-message">Failed to load saves.</div>`;
+                    console.error(error);
                 });
         }
-
+        
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initApp);
         } else {
