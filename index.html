@@ -98,8 +98,8 @@
             text-align: left;
         }
 
-        #save-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; max-width: 1600px; margin: 0 auto; padding: 80px 2rem 2rem 2rem; }
-        .save-card { background: linear-gradient(hsl(220deg 25% 4.8% / 0.5), hsl(220deg 25% 4.8% / 0.8)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid hsl(var(--hue2), 12%, 30%); border-radius: 22px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; transition: transform 0.3s ease, box-shadow 0.3s ease; color: #f0f8ff; }
+        #save-container { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; max-width: 800px; margin: 0 auto; padding: 80px 2rem 2rem 2rem; }
+        .save-card { width: 100%; background: linear-gradient(hsl(220deg 25% 4.8% / 0.5), hsl(220deg 25% 4.8% / 0.8)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid hsl(var(--hue2), 12%, 30%); border-radius: 22px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; transition: transform 0.3s ease, box-shadow 0.3s ease; color: #f0f8ff; }
         .save-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
         .save-card h2 { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.4rem; }
         .save-card p { color: #b0c4de; font-size: 0.9rem; }
@@ -145,7 +145,7 @@
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-        const config = { paused: false, currentFormation: 0, numFormations: 4 };
+        const config = { paused: false };
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0a0e17);
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -158,21 +158,23 @@
         composer.addPass(bloomPass);
         
         let path;
+        let tube;
         
         function createPath() {
+            if (tube) scene.remove(tube);
             path = new THREE.CatmullRomCurve3(Array.from({ length: 10 }, () => new THREE.Vector3(Math.random() * 40 - 20, Math.random() * 20 - 10, Math.random() * 40 - 20)));
             path.closed = true;
             path.tension = 0.5;
             const geometry = new THREE.TubeGeometry(path, 200, 0.5, 8, true);
             const material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
-            const tube = new THREE.Mesh(geometry, material);
+            tube = new THREE.Mesh(geometry, material);
             scene.add(tube);
         }
 
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
-            if (path) {
+            if (path && !config.paused) {
                 const t = (clock.getElapsedTime() * 0.05) % 1;
                 const pos = path.getPointAt(t);
                 const lookAtPos = path.getPointAt((t + 0.01) % 1);
@@ -187,10 +189,7 @@
             const toggle = document.getElementById('menu-toggle');
             toggle.addEventListener('click', () => menu.classList.toggle('open'));
 
-            document.getElementById('change-formation-btn').addEventListener('click', () => {
-                while(scene.children.length > 0){ scene.remove(scene.children[0]); }
-                createPath();
-            });
+            document.getElementById('change-formation-btn').addEventListener('click', createPath);
             document.getElementById('pause-play-btn').addEventListener('click', () => {
                 config.paused = !config.paused;
             });
