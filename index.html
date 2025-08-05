@@ -145,7 +145,7 @@
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-        const config = { paused: false, currentFormation: 0, numFormations: 1 };
+        const config = { paused: false, currentFormation: 0, numFormations: 4 };
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0a0e17);
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -157,22 +157,28 @@
         const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.7, 0.4, 0.5);
         composer.addPass(bloomPass);
         
-        const path = new THREE.CatmullRomCurve3(Array.from({ length: 10 }, () => new THREE.Vector3(Math.random() * 40 - 20, Math.random() * 20 - 10, Math.random() * 40 - 20)));
-        path.closed = true;
-        path.tension = 0.5;
-        const geometry = new THREE.TubeGeometry(path, 200, 0.5, 8, true);
-        const material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
-        const tube = new THREE.Mesh(geometry, material);
-        scene.add(tube);
+        let path;
+        
+        function createPath() {
+            path = new THREE.CatmullRomCurve3(Array.from({ length: 10 }, () => new THREE.Vector3(Math.random() * 40 - 20, Math.random() * 20 - 10, Math.random() * 40 - 20)));
+            path.closed = true;
+            path.tension = 0.5;
+            const geometry = new THREE.TubeGeometry(path, 200, 0.5, 8, true);
+            const material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
+            const tube = new THREE.Mesh(geometry, material);
+            scene.add(tube);
+        }
 
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
-            const t = (clock.getElapsedTime() * 0.05) % 1;
-            const pos = path.getPointAt(t);
-            const lookAtPos = path.getPointAt((t + 0.01) % 1);
-            camera.position.lerp(pos, 0.1);
-            camera.lookAt(lookAtPos);
+            if (path) {
+                const t = (clock.getElapsedTime() * 0.05) % 1;
+                const pos = path.getPointAt(t);
+                const lookAtPos = path.getPointAt((t + 0.01) % 1);
+                camera.position.lerp(pos, 0.1);
+                camera.lookAt(lookAtPos);
+            }
             composer.render();
         }
 
@@ -181,10 +187,18 @@
             const toggle = document.getElementById('menu-toggle');
             toggle.addEventListener('click', () => menu.classList.toggle('open'));
 
-            document.getElementById('change-formation-btn').addEventListener('click', () => console.log("Change Formation"));
-            document.getElementById('pause-play-btn').addEventListener('click', () => console.log("Pause/Play"));
-            document.getElementById('reset-camera-btn').addEventListener('click', () => console.log("Reset Cam"));
+            document.getElementById('change-formation-btn').addEventListener('click', () => {
+                while(scene.children.length > 0){ scene.remove(scene.children[0]); }
+                createPath();
+            });
+            document.getElementById('pause-play-btn').addEventListener('click', () => {
+                config.paused = !config.paused;
+            });
+            document.getElementById('reset-camera-btn').addEventListener('click', () => {
+                camera.position.set(0,0,5);
+            });
 
+            createPath();
             animate();
             fetchGameSaves();
         }
