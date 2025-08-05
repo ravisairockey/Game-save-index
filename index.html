@@ -6,229 +6,151 @@
     <title>Game Save Index</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --hue1: 210;
-            --hue2: 280;
-            --bg-dark: #0a0e17;
-            --text-primary: #f0f8ff;
+            --bg-dark: #1a1d21;
+            --glass-bg: rgba(30, 35, 42, 0.5);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #e0e1e2;
+            --text-secondary: #8a9199;
+            --accent: #3b82f6;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg-dark); color: var(--text-primary); overflow: hidden; }
-        canvas { display: block; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: 1; }
-        .main-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; z-index: 10; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-primary); overflow: hidden; }
+        canvas { display: block; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: -1; }
         
-        .floating-title {
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
+        .container { display: flex; height: 100vh; }
+
+        #sidebar {
+            width: 250px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+            transition: width 0.3s ease;
             z-index: 20;
-            padding: 0.8rem 2rem;
-            background: rgba(10, 14, 23, 0.5);
-            backdrop-filter: blur(8px);
-            border-radius: 12px;
-            border: 1px solid hsl(var(--hue1) 80% 50% / 0.3);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            color: #fff;
-            text-shadow: 0 0 10px hsl(var(--hue1) 80% 50%);
         }
 
-        .floating-footer {
-            position: fixed;
-            bottom: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 20;
-            font-size: 0.8rem;
-            color: #aaa;
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
         }
-        .floating-footer a { color: hsl(var(--hue1) 80% 70%); text-decoration: none; }
 
-        #side-menu {
-            position: fixed;
-            top: 50%;
-            right: -220px; /* Changed from left */
-            transform: translateY(-50%);
-            width: 200px;
-            background: rgba(10, 14, 23, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid hsl(var(--hue1) 80% 50% / 0.3);
-            border-top-left-radius: 12px;
-            border-bottom-left-radius: 12px;
-            z-index: 30;
-            transition: right 0.4s ease-in-out;
+        .content-header {
+            padding: 1rem 1.5rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #save-list { padding: 1.5rem; }
+        .save-item {
+            display: flex;
+            align-items: center;
             padding: 1rem;
-        }
-        #side-menu.open { right: 0; }
-
-        #menu-toggle {
-            position: absolute;
-            top: 50%;
-            right: 100%; /* Changed from left */
-            transform: translateY(-50%);
-            width: 40px;
-            height: 60px;
-            background: rgba(10, 14, 23, 0.8);
-            border: 1px solid hsl(var(--hue1) 80% 50% / 0.3);
-            border-right: none;
-            border-top-left-radius: 8px;
-            border-bottom-left-radius: 8px;
-            cursor: pointer;
-            display: grid;
-            place-items: center;
-            color: #fff;
-            font-size: 1.5rem;
-        }
-
-        .menu-content button {
-            display: block;
-            width: 100%;
-            padding: 0.8rem;
-            margin-bottom: 0.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            text-align: left;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
             transition: background-color 0.2s;
         }
-        .menu-content button:hover { background-color: rgba(255, 255, 255, 0.2); }
+        .save-item:hover { background-color: rgba(255,255,255,0.05); }
+        .save-info { flex-grow: 1; }
+        .save-info h2 { font-size: 1.1rem; font-weight: 600; }
+        .save-info p { font-size: 0.9rem; color: var(--text-secondary); }
+        .download-button { padding: 0.5rem 1rem; background: var(--accent); color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; transition: background-color 0.2s; }
+        .download-button:hover { background-color: #2563eb; }
 
-        #save-container { display: flex; flex-direction: column; align-items: flex-start; gap: 1.5rem; max-width: 1000px; margin: 0; padding: 80px 2rem 2rem 2rem; }
-        .save-card { width: 100%; background: linear-gradient(hsl(220deg 25% 4.8% / 0.5), hsl(220deg 25% 4.8% / 0.8)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid hsl(var(--hue2), 12%, 30%); border-radius: 22px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s ease, box-shadow 0.3s ease; color: #f0f8ff; }
-        .save-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
-        .save-card-info h2 { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.4rem; }
-        .save-card-info p { color: #b0c4de; font-size: 0.9rem; margin-top: 0.5rem; }
-        .download-button { padding: 0.8rem 1.2rem; background: hsl(var(--hue1) 30% 15% / 0.5); border: 1px solid hsl(var(--hue1) 15% 16% / 0.5); color: #fff; text-decoration: none; text-align: center; border-radius: 8px; font-weight: 600; transition: all 0.2s ease; }
-        .download-button:hover { background: hsl(var(--hue1) 40% 24% / 0.8); box-shadow: 0 0 15px hsl(var(--hue1) 80% 50% / 0.5); }
-        .loader, .error-message { grid-column: 1 / -1; text-align: center; padding: 3rem; font-size: 1.2rem; color: #b0c4de; background: rgba(10, 14, 23, 0.5); backdrop-filter: blur(5px); border-radius: 22px; }
     </style>
 </head>
 <body>
-    <canvas id="neural-network-canvas"></canvas>
-    
-    <header class="floating-title">Game Save Index</header>
-
-    <aside id="side-menu">
-        <div id="menu-toggle">☰</div>
-        <div class="menu-content">
-            <button id="sort-name-btn">Sort by Name</button>
-            <button id="sort-date-btn">Sort by Date</button>
-            <hr style="border-color: rgba(255,255,255,0.2); margin: 1rem 0;">
-            <button id="change-formation-btn">Formation</button>
-            <button id="pause-play-btn">Pause</button>
-            <button id="reset-camera-btn">Reset Cam</button>
+    <canvas id="background-canvas"></canvas>
+    <div class="container">
+        <aside id="sidebar">
+            <!-- Sidebar content will be added by JS -->
+        </aside>
+        <div class="main-content">
+            <header class="content-header">
+                <!-- Header content will be added by JS -->
+            </header>
+            <main id="save-list">
+                <div class="loader">Loading...</div>
+            </main>
         </div>
-    </aside>
-
-    <div class="main-content">
-        <main>
-            <div id="save-container">
-                <div class="loader">Loading Save Files...</div>
-            </div>
-        </main>
     </div>
 
-    <footer class="floating-footer">
-        <p>Powered by <a href="https://github.com/ravisairockey/Game-save-index" target="_blank">ravisairockey</a></p>
-    </footer>
-
     <script type="importmap">
-    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/" } }
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js" } }
     </script>
-
     <script type="module">
         import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-        const config = { paused: false };
-        let saveFilesCache = [];
+        // --- 3D Background ---
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a0e17);
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 5;
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('neural-network-canvas'), antialias: true });
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('background-canvas'), antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        const composer = new EffectComposer(renderer);
-        composer.addPass(new RenderPass(scene, camera));
-        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.7, 0.4, 0.5);
-        composer.addPass(bloomPass);
-        
-        let path;
-        let tube;
-        
-        function createPath() {
-            if (tube) scene.remove(tube);
-            path = new THREE.CatmullRomCurve3(Array.from({ length: 10 }, () => new THREE.Vector3(Math.random() * 40 - 20, Math.random() * 20 - 10, Math.random() * 40 - 20)));
-            path.closed = true;
-            path.tension = 0.5;
-            const geometry = new THREE.TubeGeometry(path, 200, 0.5, 8, true);
-            const material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
-            tube = new THREE.Mesh(geometry, material);
-            scene.add(tube);
+        camera.position.z = 5;
+        const points = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0xffffff, size: 0.02 }));
+        const positions = [];
+        for (let i = 0; i < 10000; i++) {
+            positions.push((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10);
         }
-
-        const clock = new THREE.Clock();
+        points.geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        scene.add(points);
         function animate() {
             requestAnimationFrame(animate);
-            if (path && !config.paused) {
-                const t = (clock.getElapsedTime() * 0.05) % 1;
-                const pos = path.getPointAt(t);
-                const lookAtPos = path.getPointAt((t + 0.01) % 1);
-                camera.position.lerp(pos, 0.1);
-                camera.lookAt(lookAtPos);
-            }
-            composer.render();
+            points.rotation.x += 0.0005;
+            points.rotation.y += 0.0005;
+            renderer.render(scene, camera);
         }
+        animate();
 
-        function initApp() {
-            const menu = document.getElementById('side-menu');
-            const toggle = document.getElementById('menu-toggle');
-            toggle.addEventListener('click', () => menu.classList.toggle('open'));
+        // --- App Logic ---
+        let saveFilesCache = [];
 
-            document.getElementById('change-formation-btn').addEventListener('click', createPath);
-            document.getElementById('pause-play-btn').addEventListener('click', () => { config.paused = !config.paused; });
-            document.getElementById('reset-camera-btn').addEventListener('click', () => { camera.position.set(0,0,5); });
-            document.getElementById('sort-name-btn').addEventListener('click', () => renderSaves('name'));
-            document.getElementById('sort-date-btn').addEventListener('click', () => renderSaves('date'));
-
-            createPath();
-            animate();
-            fetchGameSaves();
+        function formatTitle(filename) {
+            let name = filename.replace('.zip', '').replace(/_/g, ' ').replace(/-/g, ' ');
+            name = name.replace(/save|files/gi, '').trim();
+            // Acronym expansion
+            const acronyms = { 'ac': "Assassin's Creed", 'rdr2': 'Red Dead Redemption 2', 'gta v': 'Grand Theft Auto V' };
+            for (const key in acronyms) {
+                if (name.toLowerCase().startsWith(key)) {
+                    name = name.replace(new RegExp(key, 'i'), acronyms[key]);
+                }
+            }
+            // Remove dates
+            name = name.replace(/\d{1,2}\s?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s?\d{2,4}/i, '').trim();
+            return name.replace(/\s+/g, ' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
         }
 
         function renderSaves(sortBy = 'name') {
-            const container = document.getElementById('save-container');
+            const container = document.getElementById('save-list');
             container.innerHTML = '';
-
             const sortedFiles = [...saveFilesCache].sort((a, b) => {
                 if (sortBy === 'date') {
-                    // A simple date extraction from filename, might need adjustment
                     const dateA = new Date(a.name.split('_').pop().split('.').shift().replace(/-/g, ' '));
                     const dateB = new Date(b.name.split('_').pop().split('.').shift().replace(/-/g, ' '));
                     return dateB - dateA;
                 }
-                return a.name.localeCompare(b.name); // Sort by name
+                return a.name.localeCompare(b.name);
             });
 
             sortedFiles.forEach(file => {
-                const saveName = file.name.replace('.zip', '').replace(/_/g, ' ').replace(/save/gi, '').trim();
-                const fileSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
                 const card = document.createElement('div');
-                card.className = 'save-card';
+                card.className = 'save-item';
                 card.innerHTML = `
-                    <div class="save-card-info">
-                        <h2>${saveName}</h2>
-                        <p>File: ${file.name}</p>
-                        <p>Size: ${fileSize}</p>
+                    <div class="save-info">
+                        <h2>${formatTitle(file.name)}</h2>
+                        <p>File: ${file.name} | Size: ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
                     </div>
                     <a href="${file.download_url}" class="download-button" download>Download</a>
                 `;
@@ -237,29 +159,30 @@
         }
 
         function fetchGameSaves() {
-            const container = document.getElementById('save-container');
             const apiUrl = `https://api.github.com/repos/ravisairockey/Game-save-index/contents/saves`;
             fetch(apiUrl)
                 .then(response => response.json())
                 .then(files => {
                     saveFilesCache = files.filter(file => file.name.endsWith('.zip'));
-                    if (saveFilesCache.length === 0) {
-                        container.innerHTML = `<div class="error-message">No .zip save files found.</div>`;
-                        return;
-                    }
-                    renderSaves(); // Initial render
+                    renderSaves();
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    container.innerHTML = `<div class="error-message">Failed to load save files.</div>`;
+                    document.getElementById('save-list').innerHTML = `<div class="error-message">Failed to load saves.</div>`;
+                    console.error(error);
                 });
         }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initApp);
-        } else {
-            initApp();
-        }
+        
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Populate sidebar and header
+            document.getElementById('sidebar').innerHTML = `<h2>GameVault</h2>`;
+            document.querySelector('.content-header').innerHTML = `
+                <div><button id="sort-name-btn">Sort by Name</button> <button id="sort-date-btn">Sort by Date</button></div>
+            `;
+            document.getElementById('sort-name-btn').addEventListener('click', () => renderSaves('name'));
+            document.getElementById('sort-date-btn').addEventListener('click', () => renderSaves('date'));
+            fetchGameSaves();
+        });
     </script>
 </body>
 </html>
